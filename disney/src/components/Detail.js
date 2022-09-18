@@ -1,18 +1,47 @@
 import React from 'react'
 import styled from 'styled-components'
+import { useEffect, useState } from 'react'
+import db from "../firebase";
+import { useParams } from 'react-router-dom';
+import { getDoc, doc } from 'firebase/firestore';
+import { async } from '@firebase/util';
+
 
 function Detail() {
+  const { id } = useParams();
+
+  const [ detailData, setDetailData ] = useState({});
+  
+
+  useEffect(()  => {
+    const fetchData = async () => {
+      const docRef  = doc(db, 'movies', id)
+      const docSnap = await getDoc(docRef)
+
+      if (docSnap.exists()) {
+        setDetailData(docSnap.data())
+        // console.log("Document data:", docSnap.data());
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    }
+
+    fetchData()
+
+  }, [id]);
+
   return (
     <Container>
       <Background>
-        <img src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/01E873C686EF29975B3760568B754A514BF7D4B5C3E8F89B180C8753EE1D0D78/scale?width=1440&aspectRatio=1.78&format=jpeg" />
-      </Background>
 
+        <img alt={detailData.title} src={detailData.backgroundImg} />
+      </Background>
       <ImageTitle>
-        <img src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/E83AAB9620FC72320D8CBA8D5E1421635AC4C961B08ADC3F691B031A24D7CD38/scale?width=1440&aspectRatio=1.78&format=png" />
+        <img src={detailData.titleImg} />
       </ImageTitle>
-      <KeepLeft>
         <Controls>
+          
           <PlayButton>
             <img src="/images/play-icon-black.png" />
             <span>Play</span>
@@ -34,13 +63,12 @@ function Detail() {
         </Controls>
 
         <SubTitle>
-          2018 • 7m • Family, Fantasy, Kids, Animation
+          {detailData.subTitle}
         </SubTitle>
 
         <Description>
-        A Chinese mom who’s sad when her grown son leaves home gets another chance at motherhood when one of her dumplings springs to life. But she finds that nothing stays cute and small forever.
+        {detailData.description}
         </Description>
-      </KeepLeft>
     </Container>
   )
 }
@@ -75,16 +103,13 @@ const ImageTitle = styled.div`
   min-height: 170px;
   width: 35vw;
   min-width: 200px;
+  margin-top: 60px;
 
   img {
     width:100%;
     height:100%;
     object-fit: contain;
   }
-`
-
-const KeepLeft = styled.div`
-  max-width: 874px;
 `
 
 const Controls = styled.div`
@@ -118,6 +143,7 @@ const TrailerButton = styled(PlayButton)`
 
   &:hover{
     background: rgba(198, 198, 198, 0.5);
+  }
 `
 
 const AddButton = styled.button`
@@ -153,4 +179,5 @@ const Description = styled.div`
   font-size: 20px;
   margin-top: 16px;
   color: rgb(249, 249, 249);
+  max-width: 760px;
 `
