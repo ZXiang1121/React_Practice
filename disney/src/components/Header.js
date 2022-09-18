@@ -101,7 +101,7 @@ function Header() {
 
           </NavMenu>
         
-          <UserImg onClick={ outUser } src="images\my-image.jpg" />
+          <UserImg onClick={ outUser } src={userPhoto} alt={userName} />
           </>
           }
         
